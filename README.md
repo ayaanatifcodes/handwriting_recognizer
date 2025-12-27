@@ -1,4 +1,4 @@
-# handwriting_recognizer
+# AI-Powered Handwriting Recogniser
 
 This project is developed in collaboration with a friend and focuses on creating an AI-powered handwritten text recognition system using Python. It leverages OpenCV for image preprocessing, NumPy for efficient numerical computation, and TensorFlow for deep learning to accurately convert handwritten images into digital text.
 
