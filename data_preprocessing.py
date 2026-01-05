@@ -16,7 +16,7 @@ class Preprocessor:
         self.augment = augmentation
         self.vocab = vocab
         
-        self.affine_tranform = transforms.Compose([
+        self.affine_transform = transforms.Compose([
             transforms.ToPILImage(),
             transforms.RandomAffine(
                 degrees=15,
@@ -119,4 +119,5 @@ class Preprocessor:
         img = torch.from_numpy(img).float()
         img = img / 255.0
         return img
+
 
