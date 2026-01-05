@@ -1,28 +1,28 @@
 import cv2
-import numpy as np
 import torch
+import numpy as np
 from torchvision import transforms
+import torch
 from typing import Tuple
-
 
 class Preprocessor:
     def __init__(
-        self,
-        image_size: Tuple[int, int] = (400, 32),
-        augmentation: bool = False,
-        vocab: str = ""
+            self,
+            image_size: Tuple[int, int] = (244, 244),
+            augmentation: bool = False,
+            vocab: str = ""
     ):
         self.image_size = image_size
         self.augment = augmentation
         self.vocab = vocab
-
-        self.affine_transform = transforms.Compose([
+        
+        self.affine_tranform = transforms.Compose([
             transforms.ToPILImage(),
             transforms.RandomAffine(
-                degrees=(-2, 2),
-                scale=(0.9, 1.0),
-                shear=5,
-                fill=255
+                degrees=15,
+                translate=(0.1, 0.1),
+                scale=(0.9, 1.1),
+                shear=10
             )
         ])
 
@@ -119,3 +119,4 @@ class Preprocessor:
         img = torch.from_numpy(img).float()
         img = img / 255.0
         return img
+
