@@ -19,7 +19,7 @@ class Preprocessor:
         self.affine_transform = transforms.Compose([
             transforms.ToPILImage(),
             transforms.RandomAffine(
-                degrees=15,
+                degrees=25,
                 translate=(0.1, 0.1),
                 scale=(0.9, 1.1),
                 shear=10
@@ -119,3 +119,4 @@ class Preprocessor:
         img = torch.from_numpy(img).float()
         img = img / 255.0
         return img
+
