@@ -119,5 +119,3 @@ class Preprocessor:
         img = torch.from_numpy(img).float()
         img = img / 255.0
         return img
-
-
