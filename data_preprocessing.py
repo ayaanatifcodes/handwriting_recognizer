@@ -25,15 +25,17 @@ class Preprocessor:  # Class definition
             )
         ])
 
-    def __call__(self, img: np.ndarray, label: str, max_len: int = 32):
-        img, label = self.preprocess_img(img, label)
-        label = self.label_indexer(self.vocab, label)
-        label = self.label_padding(len(self.vocab), max_len, label)
-
-        if self.augment:
-            img = self.apply_augmentation(img)
-
-        return img, label
+        def __call__(self, img: np.ndarray, label: str, max_len: int = 32): # Allows the class object to be called like a function
+        img, label = self.preprocess_img(img, label) # Preprocesses the image (resize and padding) and keeps the label unchanged
+        # preprocess_img resizes the image to fit a fixed size while preserving its aspect ratio and pads the remaining space with white pixels
+        label = self.label_indexer(self.vocab, label) # Converts each character in the label into its corresponding index using the vocabulary
+        # label_indexer converts each character in a label into its corresponding index based on a given vocabulary
+        label = self.label_padding(len(self.vocab), max_len, label) # Pads the label to a fixed length using the vocabulary size as the padding value
+        # label_padding truncates or pads a label so that all labels have a fixed length (vocab size used for padding)
+        
+        if self.augment: # Checks if data augmentation is enabled
+            img = self.apply_augmentation(img) # Applies random augmentations to the image
+        return img, label # Returns the processed image and the processed label
 
     def preprocess_img(self, img: np.ndarray, text: str):
         target_w, target_h = self.image_size
@@ -118,4 +120,5 @@ class Preprocessor:  # Class definition
         img = torch.from_numpy(img).float()
         img = img / 255.0
         return img
+
 
