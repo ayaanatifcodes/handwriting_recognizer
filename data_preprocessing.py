@@ -1,28 +1,27 @@
-import cv2
-import torch
-import numpy as np
-from torchvision import transforms
-import torch
-from typing import Tuple
+import cv2  # Importing OpenCV for image processing
+import torch  # Importing PyTorch
+import numpy as np  # Importing NumPy and using 'np' for convenience
+from torchvision import transforms  # Importing transforms for data augmentation
+from typing import Tuple  # Tuple is used for type hinting and immutability of size values
 
-class Preprocessor:
-    def __init__(
-            self,
-            image_size: Tuple[int, int] = (244, 244),
-            augmentation: bool = False,
-            vocab: str = ""
+class Preprocessor:  # Class definition
+    def __init__(  # Constructor (initialization method)
+            self,  # Refers to the current instance of the class
+            image_size: Tuple[int, int] = (244, 244),  # Target image size with a default value
+            augmentation: bool = False,  # Boolean to enable or disable data augmentation
+            vocab: str = ""  # Vocabulary string used for label encoding
     ):
-        self.image_size = image_size
-        self.augment = augmentation
-        self.vocab = vocab
+        self.image_size = image_size  # Stores the image size
+        self.augment = augmentation  # Stores whether augmentation is enabled
+        self.vocab = vocab  # Stores the vocabulary
         
-        self.affine_transform = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.RandomAffine(
-                degrees=25,
-                translate=(0.1, 0.1),
-                scale=(0.7, 1.1),
-                shear=10
+        self.affine_transform = transforms.Compose([  # Compose applies multiple transforms sequentially
+            transforms.ToPILImage(),  # Converts NumPy or Torch image to PIL format (required for torchvision transforms)
+            transforms.RandomAffine(  # Applies random affine transformations for data augmentation
+                degrees=25,  # Allows random rotation between -25 and +25 degrees
+                translate=(0.1, 0.1),  # Allows translation up to 10% in both x and y directions
+                scale=(0.7, 1.1),  # Allows scaling between 70% and 110% of the original size
+                shear=10  # Allows shearing (skewing) of the image
             )
         ])
 
@@ -119,3 +118,4 @@ class Preprocessor:
         img = torch.from_numpy(img).float()
         img = img / 255.0
         return img
+
