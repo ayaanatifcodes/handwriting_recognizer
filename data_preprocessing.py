@@ -1,41 +1,38 @@
-import cv2  # Importing OpenCV for image processing
-import torch  # Importing PyTorch
-import numpy as np  # Importing NumPy and using 'np' for convenience
-from torchvision import transforms  # Importing transforms for data augmentation
-from typing import Tuple  # Tuple is used for type hinting and immutability of size values
+import cv2
+import torch
+import numpy as np
+from torchvision import transforms
+from typing import Tuple
 
-class Preprocessor:  # Class definition
-    def __init__(  # Constructor (initialization method)
-            self,  # Refers to the current instance of the class
-            image_size: Tuple[int, int] = (244, 244),  # Target image size with a default value
-            augmentation: bool = False,  # Boolean to enable or disable data augmentation
-            vocab: str = ""  # Vocabulary string used for label encoding
+class Preprocessor:
+    def __init__(
+            self,
+            image_size: Tuple[int, int] = (244, 244),
+            augmentation: bool = False,
+            vocab: str = ""
     ):
-        self.image_size = image_size  # Stores the image size
-        self.augment = augmentation  # Stores whether augmentation is enabled
-        self.vocab = vocab  # Stores the vocabulary
+        self.image_size = image_size
+        self.augment = augmentation
+        self.vocab = vocab
         
-        self.affine_transform = transforms.Compose([  # Compose applies multiple transforms sequentially
-            transforms.ToPILImage(),  # Converts NumPy or Torch image to PIL format (required for torchvision transforms)
-            transforms.RandomAffine(  # Applies random affine transformations for data augmentation
-                degrees=25,  # Allows random rotation between -25 and +25 degrees
-                translate=(0.1, 0.1),  # Allows translation up to 10% in both x and y directions
-                scale=(0.7, 1.1),  # Allows scaling between 70% and 110% of the original size
-                shear=10  # Allows shearing (skewing) of the image
+        self.affine_transform = transforms.Compose([
+            transforms.ToPILImage(),
+            transforms.RandomAffine(
+                degrees=25,
+                translate=(0.1, 0.1),
+                scale=(0.7, 1.1),
+                shear=10
             )
         ])
 
-        def __call__(self, img: np.ndarray, label: str, max_len: int = 32): # Allows the class object to be called like a function
-        img, label = self.preprocess_img(img, label) # Preprocesses the image (resize and padding) and keeps the label unchanged
-        # preprocess_img resizes the image to fit a fixed size while preserving its aspect ratio and pads the remaining space with white pixels
-        label = self.label_indexer(self.vocab, label) # Converts each character in the label into its corresponding index using the vocabulary
-        # label_indexer converts each character in a label into its corresponding index based on a given vocabulary
-        label = self.label_padding(len(self.vocab), max_len, label) # Pads the label to a fixed length using the vocabulary size as the padding value
-        # label_padding truncates or pads a label so that all labels have a fixed length (vocab size used for padding)
+        def __call__(self, img: np.ndarray, label: str, max_len: int = 32):
+        img, label = self.preprocess_img(img, label)
+        label = self.label_indexer(self.vocab, label)
+        label = self.label_padding(len(self.vocab), max_len, label)
         
-        if self.augment: # Checks if data augmentation is enabled
-            img = self.apply_augmentation(img) # Applies random augmentations to the image
-        return img, label # Returns the processed image and the processed label
+        if self.augment:
+            img = self.apply_augmentation(img)
+        return img, label
 
     def preprocess_img(self, img: np.ndarray, text: str):
         target_w, target_h = self.image_size
@@ -120,5 +117,6 @@ class Preprocessor:  # Class definition
         img = torch.from_numpy(img).float()
         img = img / 255.0
         return img
+
 
 
