@@ -42,34 +42,32 @@ class Preprocessor: # Class defined
             img = self.apply_augmnetation(img) # Apply augmnetation on the image for preprocessing
         return img, label # Return the processed image and label
 
-    def preprocess_img(self, img: np.ndarray, text: str):
-        target_w, target_h = self.image_size
-        h, w = img.shape[:2]
+    def preprocess_img(self, img: np.ndarray, text: str):  # Function to preprocess an image and return it with text
+    target_w, target_h = self.image_size  # Target width and height for the image
+    h, w = img.shape[:2]  # Original height and width of the input image
+    scale = min(target_w / w, target_h / h)  # Scaling factor to keep aspect ratio within target size
+    new_w, new_h = int(w * scale), int(h * scale)  # New width and height after scaling
+    img = cv2.resize(img, (new_w, new_h))  # Resize the image to scaled dimensions
 
-        scale = min(target_w / w, target_h / h)
-        new_w, new_h = int(w * scale), int(h * scale)
+    pad_w = target_w - new_w  # Total horizontal padding required
+    pad_h = target_h - new_h  # Total vertical padding required
 
-        img = cv2.resize(img, (new_w, new_h))
+    left = pad_w // 2  # Padding added to the left side
+    right = pad_w - left  # Remaining padding added to the right side
+    top = pad_h // 2  # Padding added to the top
+    bottom = pad_h - top  # Remaining padding added to the bottom
 
-        pad_w = target_w - new_w
-        pad_h = target_h - new_h
+    img = cv2.copyMakeBorder(  # Add padding around the image
+        img,  # Input image
+        top,  # Top padding
+        bottom,  # Bottom padding
+        left,  # Left padding
+        right,  # Right padding
+        cv2.BORDER_CONSTANT,  # Use a constant color for the border
+        value=255  # White padding color
+    )
 
-        left = pad_w // 2
-        right = pad_w - left
-        top = pad_h // 2
-        bottom = pad_h - top
-
-        img = cv2.copyMakeBorder(
-            img,
-            top,
-            bottom,
-            left,
-            right,
-            cv2.BORDER_CONSTANT,
-            value=255
-        )
-
-        return img, text
+    return img, text  # Return the padded image and original text
 
     def apply_augmentation(self, img: np.ndarray) -> np.ndarray:
         if np.random.rand() < 0.5:
@@ -125,6 +123,7 @@ class Preprocessor: # Class defined
         img = torch.from_numpy(img).float()
         img = img / 255.0
         return img
+
 
 
 
