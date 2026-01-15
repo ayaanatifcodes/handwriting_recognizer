@@ -1,38 +1,46 @@
 import cv2
 import torch
-import numpy as np
 from torchvision import transforms
+import numpy as np
 from typing import Tuple
 
-class Preprocessor:
-    def __init__(
+# Importing all the necessary technologies
+
+class Preprocessor: # Class defined
+    def __init__( # Initialization of a few objects
             self,
-            image_size: Tuple[int, int] = (244, 244),
-            augmentation: bool = False,
-            vocab: str = ""
+            image_size: Tuple[int, int] =  (244, 244), # Tuple ensures values stay stable
+            augmentation: bool = False, # Flagged as not needed during processing of real data
+            vocab: str = "" # Null due to no vocab being passed
     ):
+       
         self.image_size = image_size
         self.augment = augmentation
         self.vocab = vocab
-        
-        self.affine_transform = transforms.Compose([
-            transforms.ToPILImage(),
-            transforms.RandomAffine(
-                degrees=25,
-                translate=(0.1, 0.1),
-                scale=(0.7, 1.1),
-                shear=10
+
+        self.affine_transform = transforms.Compose([ # Composing a series of transformations
+            transforms.ToPILImage(), # Torch or NumPy array to PIL image
+            transforms.RandomAffine( # Random values will be set for data
+                degrees = 25,
+                translate = (0.1, 0.1),
+                shear = 10,
+                scale = (0.8, 1.2)
+                # The upper values are RANGES rather than absolutes
             )
         ])
 
-        def __call__(self, img: np.ndarray, label: str, max_len: int = 32):
+    def __call__(self, img: np.ndarray, label: str, max_len: int = 35): # Image set to a NumPy array
         img, label = self.preprocess_img(img, label)
+        # In the preprocess function, the image is resized to what all data should be in dimensions
+        # Label will be cleaned, meaning that all the extra spaces will be cleared and the text will be made lowercase
         label = self.label_indexer(self.vocab, label)
+        # The label will be converted into indices based on the vocab provided
         label = self.label_padding(len(self.vocab), max_len, label)
-        
-        if self.augment:
-            img = self.apply_augmentation(img)
-        return img, label
+        # The label will be padded to ensure that all labels are of the same length
+
+        if self.augment: # If set to true, augment the image
+            img = self.apply_augmnetation(img) # Apply augmnetation on the image for preprocessing
+        return img, label # Return the processed image and label
 
     def preprocess_img(self, img: np.ndarray, text: str):
         target_w, target_h = self.image_size
@@ -117,6 +125,7 @@ class Preprocessor:
         img = torch.from_numpy(img).float()
         img = img / 255.0
         return img
+
 
 
 
