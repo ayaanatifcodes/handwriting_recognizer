@@ -11,8 +11,10 @@ class Preprocessor:  # Define preprocessing class
         self.image_size = image_size  # Store target image size
         self.augment = augmentation  # Store augmentation flag
         self.vocab = vocab  # Store vocabulary string
-        self.vocab_dict: Dict[str, int] = {c: i for i, c in enumerate(vocab)}  # Create fast char→index mapping
-
+        self.vocab_dict = {}
+        for i, c in enumerate(vocab):
+            self.vocab_dict[c] = i
+        
         self.affine_transform = transforms.Compose([  # Combine multiple image transforms
             transforms.ToPILImage(),  # Convert NumPy image to PIL image
             transforms.RandomAffine(  # Apply random affine transformation
@@ -93,3 +95,4 @@ class Preprocessor:  # Define preprocessing class
         img = img.permute(2, 0, 1)  # Convert to CHW format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
