@@ -26,7 +26,6 @@ class HandwritingDataset(Dataset):
         self.vocab: str = vocabulary
         self.max_len: int = max_len
         self.data_preprocessor: Preprocessor = Preprocessor(
-            image=None, 
             vocab=self.vocab, 
             augmentation=augmentations
         )
@@ -49,3 +48,4 @@ class HandwritingDataset(Dataset):
         image = image / 255.0
        
         return image, label_indices
+
