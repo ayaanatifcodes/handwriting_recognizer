@@ -97,8 +97,8 @@ class Preprocessor:
         alpha = np.random.uniform(*strength_range)  # Randomly pick sharpening strength
         lightness = np.random.uniform(*lightness_range)  # Randomly pick center weight for kernel
 
-        kernel_identity = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]], dtype=np.float32)  # Identity kernel (no change)
-        kernel_sharpen = np.array([[-1, -1, -1], [-1, 8 + lightness, -1], [-1, -1, -1]], dtype=np.float32)  # Sharpen kernel emphasizing edges
+        kernel_identity = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]], dtype = np.float32)  # Identity kernel (no change)
+        kernel_sharpen = np.array([[-1, -1, -1], [-1, 8 + lightness, -1], [-1, -1, -1]], dtype = np.float32)  # Sharpen kernel emphasizing edges
 
         kernel = (1 - alpha) * kernel_identity + alpha * kernel_sharpen  # Blend identity and sharpen kernels
         return cv2.filter2D(image, -1, kernel)  # Apply convolution with blended kernel
@@ -118,3 +118,4 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to CHW format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
