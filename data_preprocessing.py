@@ -118,4 +118,3 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to CHW format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
-
