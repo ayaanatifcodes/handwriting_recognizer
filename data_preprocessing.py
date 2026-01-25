@@ -85,7 +85,7 @@ class Preprocessor:
             img = self.random_sharpen(img)  # Apply random sharpening
 
         if np.random.rand() < 0.5:  # 50% chance to apply affine transform
-            img = np.array(self.affine_transform(img))  # Apply affine transform and convert back to NumPy
+            img = np.array(self.affine_transform(img))  # Apply affine transform and convert back to NumPy --> usually converted as OpenCV expects + faster to process
         return img  # Return augmented image
     
     @staticmethod
@@ -118,4 +118,5 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to CHW format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
 
