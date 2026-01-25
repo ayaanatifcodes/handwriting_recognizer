@@ -94,14 +94,16 @@ class Preprocessor:
         strength_range: Tuple[float, float] = (0.25, 1.0),  # Range for sharpening strength
         lightness_range: Tuple[float, float] = (0.75, 2.0)  # Range for brightness adjustment
     ) -> np.ndarray:
-        alpha = np.random.uniform(*strength_range)  # Randomly pick sharpening strength
+        alpha = np.random.uniform(*strength_range)  # Randomly pick sharpening strength --> * used to divide into augments
         lightness = np.random.uniform(*lightness_range)  # Randomly pick center weight for kernel
 
-        kernel_identity = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]], dtype = np.float32)  # Identity kernel (no change)
+        kernel_identity = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]], dtype = np.float32)  # Identity kernel (no change) --> base kernels
+        # It is an identity matrix --> '1' is the centre pixel
         kernel_sharpen = np.array([[-1, -1, -1], [-1, 8 + lightness, -1], [-1, -1, -1]], dtype = np.float32)  # Sharpen kernel emphasizing edges
-
-        kernel = (1 - alpha) * kernel_identity + alpha * kernel_sharpen  # Blend identity and sharpen kernels
-        return cv2.filter2D(image, -1, kernel)  # Apply convolution with blended kernel
+        # '+' means boosting this pixel, '-' means ignoring this pixel
+        # Wants to seperate the centre pixel from the neighbors --> brightness makes strokes 'lol' darker
+        kernel = (1 - alpha) * kernel_identity + alpha * kernel_sharpen  # Blend identity and sharpen kernels e.g 0.3 means 70% of the original
+        return cv2.filter2D(image, -1, kernel)  # Apply convolution with blended kernel --> the kernel acts as a filter over the image, modifying the pixels and sharmening the image as a whole
 
     @staticmethod
     def label_indexer(vocab_dict: Dict[str, int], label: str) -> np.ndarray:
@@ -118,5 +120,3 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to CHW format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
-
-
