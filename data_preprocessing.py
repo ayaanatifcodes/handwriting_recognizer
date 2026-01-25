@@ -42,7 +42,7 @@ class Preprocessor:
         if self.augment:  
             img = self.apply_augmentation(img)  # Apply random augmentations if enabled
         img = torch.from_numpy(img)  # Convert NumPy array to PyTorch tensor
-        img = img.permute(2, 0, 1)  # Change shape from (H, W, C) to (C, H, W)
+        img = img.permute(2, 0, 1)  # Change shape from (H, W, C) to (C, H, W) --> this is the model format and this is usually done due to PyTorch
         img = img.float() / 255.0  # Normalize pixel values to [0,1]
         return img, label  # Return processed image and label
     
@@ -118,3 +118,4 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to CHW format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
