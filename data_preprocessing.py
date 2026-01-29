@@ -70,7 +70,7 @@ class Preprocessor:
             bottom,  # Bottom border
             left,  # Left border
             right,  # Right border
-            cv2.BORDER_CONSTANT,  # Use constant color for padding
+            cv2.BORDER_CONSTANT,  # Use constant color for padding (one of three possible)
             value=255  # White padding
         )
 
@@ -101,9 +101,9 @@ class Preprocessor:
         # It is an identity matrix --> '1' is the centre pixel
         kernel_sharpen = np.array([[-1, -1, -1], [-1, 8 + lightness, -1], [-1, -1, -1]], dtype = np.float32)  # Sharpen kernel emphasizing edges
         # '+' means boosting this pixel, '-' means ignoring this pixel
-        # Wants to seperate the centre pixel from the neighbors --> brightness makes strokes 'lol' darker
+        # Wants to seperate the centre pixel from the neighbors --> brightness makes strokes darker
         kernel = (1 - alpha) * kernel_identity + alpha * kernel_sharpen  # Blend identity and sharpen kernels e.g 0.3 means 70% of the original
-        return cv2.filter2D(image, -1, kernel)  # Apply convolution with blended kernel --> the kernel acts as a filter over the image, modifying the pixels and sharmening the image as a whole
+        return cv2.filter2D(image, -1, kernel)  # Apply convolution with blended kernel --> the kernel acts as a filter over the image, modifying the pixels and sharpening the image as a whole
 
     @staticmethod
     def label_indexer(vocab_dict: Dict[str, int], label: str) -> np.ndarray:
@@ -120,3 +120,4 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to CHW format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
