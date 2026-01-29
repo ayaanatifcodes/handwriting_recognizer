@@ -14,8 +14,8 @@ class HandwritingDataset(Dataset):  # custom dataset for handwriting recognition
 
     def __init__(
         self,
-        data: List[Tuple[str, str]],  # list of (image_path, label) pairs
         vocabulary: str = "",  # string containing all unique characters
+        data: List[Tuple[str, str]],  # list of (image_path, label) pairs
         max_len: int = 0,  # maximum label sequence length
         transform: Optional[Callable] = None,  # optional torchvision transform pipeline
         augmentations: bool = False  # toggle data augmentation
@@ -50,3 +50,4 @@ class HandwritingDataset(Dataset):  # custom dataset for handwriting recognition
         image = image / 255.0  # normalize pixel values to [0, 1]
 
         return image, label_indices  # return processed image and encoded label
+
