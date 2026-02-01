@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 
-
 class ResidualBlock(nn.Module):
     def __init__(
         self,
@@ -59,7 +58,6 @@ class ResidualBlock(nn.Module):
 
         return out
 
-
 class Model(nn.Module):
     def __init__(self, input_dim, output_dim, activation="leaky_relu", dropout=0.2):
         super().__init__()
@@ -107,3 +105,4 @@ class Model(nn.Module):
         x = torch.log_softmax(x, dim=2)
 
         return x
+
