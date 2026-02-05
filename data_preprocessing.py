@@ -73,7 +73,6 @@ class Preprocessor:
             cv2.BORDER_CONSTANT,  # Use constant color for padding (one of three possible)
             value=255  # White padding
         )
-
         return img, text  # Return padded image and unchanged label
     
     def apply_augmentation(
@@ -120,3 +119,4 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to Color, Width & Height format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
