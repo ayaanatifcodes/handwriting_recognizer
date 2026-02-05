@@ -117,7 +117,6 @@ class Preprocessor:
     def single_image_preprocessing(self, img: np.ndarray) -> torch.Tensor:
         img, _ = self.preprocess_img(img, "")  # Resize and pad image
         img = torch.from_numpy(img)  # Convert to tensor
-        img = img.permute(2, 0, 1)  # Convert to CHW format
+        img = img.permute(2, 0, 1)  # Convert to Color, Width & Height format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
-
