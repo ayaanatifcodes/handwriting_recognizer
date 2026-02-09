@@ -1,4 +1,4 @@
-import cv2  # OpenCV for image processing
+import cv2  # Importing OpenCV for image processing
 import numpy as np  # NumPy for array operations
 import torch  # PyTorch for tensor operations
 from torchvision import transforms  # For image augmentations
@@ -119,4 +119,5 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to Color, Width & Height format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
 
