@@ -7,9 +7,9 @@ from typing import Tuple, Dict  # For type hints
 class Preprocessor:
     def __init__(
             self,
-            image_size: Tuple[int, int] = (224, 244),  # Target image size (width, height)
-            augmentation: bool = False,  # Whether to apply augmentation
-            vocab: str = ""  # String of characters used for labeling
+            image_size: Tuple[int, int] = (224, 244),  # Target image size 
+            augmentation: bool = False,  # Whether to apply augmentation (no need after data processing is done)
+            vocab: str = ""  # String of characters used for labeling (expected output basically)
     ):
         self.image_size = image_size  # Store target image size
         self.augment = augmentation  # Store augmentation flag
@@ -119,5 +119,6 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to Color, Width & Height format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
 
 
