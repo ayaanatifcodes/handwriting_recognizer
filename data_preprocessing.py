@@ -51,7 +51,7 @@ class Preprocessor:
             img: np.ndarray,
             text: str
     ):
-        target_width, target_height = self.image_size  # Get target width and height
+        target_width, target_height = self.image_size  # Get target width and height so we can set image accordingly
         h, w = img.shape[:2]  # Original image height and width
         scale = min(target_width / w, target_height / h)  # Scaling factor to maintain aspect ratio
         new_width, new_height = int(w * scale), int(h * scale)  # Compute new dimensions
@@ -70,7 +70,7 @@ class Preprocessor:
             bottom,  # Bottom border
             left,  # Left border
             right,  # Right border
-            cv2.BORDER_CONSTANT,  # Use constant color for padding (one of three possible)
+            cv2.BORDER_CONSTANT,  # Use constant color for padding (one of three possible options)
             value=255  # White padding
         )
         return img, text  # Return padded image and unchanged label
@@ -119,6 +119,7 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to Color, Width & Height format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
 
 
 
