@@ -48,6 +48,4 @@ class HandwritingDataset(Dataset):  # custom dataset for handwriting recognition
 
         image = torch.from_numpy(image).float()  # convert NumPy array to float32 tensor
         image = image / 255.0  # normalize pixel values to [0, 1]
-
         return image, label_indices  # return processed image and encoded label
-
