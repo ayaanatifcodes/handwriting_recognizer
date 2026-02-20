@@ -20,7 +20,7 @@ class Preprocessor:
 
         self.affine_transform = transforms.Compose([  # Compose transformations for augmentation
             transforms.ToPILImage(),  # Convert NumPy array to PIL Image
-            transforms.RandomAffine(
+            transforms.RandomAffine( # Marks the order of transformations
                 degrees=15,  # Random rotation in [-15, 15] degrees
                 shear=10,  # Random shear angle
                 scale=(0.8, 1.2),  # Random scaling factor
@@ -119,3 +119,4 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to Color, Width & Height format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
