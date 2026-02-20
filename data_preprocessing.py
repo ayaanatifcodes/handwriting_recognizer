@@ -35,7 +35,7 @@ class Preprocessor:
             max_len: int = 40  # Maximum label length for padding
     ):
         img, label = self.preprocess_img(image, label)  # Resize and pad image
-        label = label.lower().strip()  # Lowercase and remove leading/trailing spaces
+        label = label.lower().strip()  # Lowercase and remove leading or traling spaces
         label = label.indexer(self.vocab_dict, label)  # Convert label chars to indices
         label = self.label_padding(len(self.vocab), max_len, label)  # Pad label to max_len
 
@@ -119,4 +119,5 @@ class Preprocessor:
         img = img.permute(2, 0, 1)  # Convert to Color, Width & Height format
         img = img.float() / 255.0  # Normalize image
         return img  # Return processed tensor
+
 
