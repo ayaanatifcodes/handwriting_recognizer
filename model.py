@@ -97,12 +97,9 @@ class Model(nn.Module):
 
         x, _ = self.blstm1(x)
         x = self.dropout1(x)
-
         x, _ = self.blstm2(x)
         x = self.dropout2(x)
-
         x = self.fc(x)
         x = torch.log_softmax(x, dim=2)
 
         return x
-
