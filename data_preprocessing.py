@@ -1,123 +1,118 @@
-import cv2  # Importing OpenCV for image processing
-import numpy as np  # NumPy for array operations
-import torch  # PyTorch for tensor operations
-from torchvision import transforms  # For image augmentations
-from typing import Tuple, Dict  # For type hints
+import cv2
+import numpy as np
+import torch
+from torchvision import transforms
+from typing import Tuple, Dict
 
 class Preprocessor:
     def __init__(
             self,
-            image_size: Tuple[int, int] = (224, 244),  # Target image size 
-            augmentation: bool = False,  # Whether to apply augmentation (no need after data processing is done)
-            vocab: str = ""  # String of characters used for labeling (expected output basically)
+            image_size: Tuple[int, int] = (224, 244),
+            augmentation: bool = False,
+            vocab: str = ""
     ):
-        self.image_size = image_size  # Store target image size
-        self.augment = augmentation  # Store augmentation flag
-        self.vocab = vocab  # Store vocabulary string
-        self.vocab_dict = {}  # Initialize empty dictionary for char-to-index mapping
-        for i, c in enumerate(vocab):  
-            self.vocab_dict[c] = i  # Map each character to a unique integer index
+        self.image_size = image_size
+        self.augment = augmentation
+        self.vocab = vocab
+        self.vocab_dict = {}
+        for i, c in enumerate(vocab):
+            self.vocab_dict[c] = i
 
-        self.affine_transform = transforms.Compose([  # Compose transformations for augmentation
-            transforms.ToPILImage(),  # Convert NumPy array to PIL Image
-            transforms.RandomAffine( # Marks the order of transformations
-                degrees=15,  # Random rotation in [-15, 15] degrees
-                shear=10,  # Random shear angle
-                scale=(0.8, 1.2),  # Random scaling factor
-                translate=(0.2, 0.4)  # Random translation as fraction of width/height
+        self.affine_transform = transforms.Compose([
+            transforms.ToPILImage(),
+            transforms.RandomAffine(
+                degrees=15,
+                shear=10,
+                scale=(0.8, 1.2),
+                translate=(0.2, 0.4)
             )
-        ])    
+        ])
 
     def __call__(
             self,
             image: np.ndarray,
             label: str,
-            max_len: int = 40  # Maximum label length for padding
+            max_len: int = 40
     ):
-        img, label = self.preprocess_img(image, label)  # Resize and pad image
-        label = label.lower().strip()  # Lowercase and remove leading or traling spaces
-        label = label.indexer(self.vocab_dict, label)  # Convert label chars to indices
-        label = self.label_padding(len(self.vocab), max_len, label)  # Pad label to max_len
+        img, label = self.preprocess_img(image, label)
+        label = label.lower().strip()
+        label = self.label_indexer(self.vocab_dict, label)
+        label = self.label_padding(len(self.vocab), max_len, label)
 
-        if self.augment:  
-            img = self.apply_augmentation(img)  # Apply random augmentations if enabled
-        img = torch.from_numpy(img)  # Convert NumPy array to PyTorch tensor
-        img = img.permute(2, 0, 1)  # Change shape from (H, W, C) to (C, H, W) --> this is the model format and this is usually done due to PyTorch
-        img = img.float() / 255.0  # Normalize pixel values to [0,1]
-        return img, label  # Return processed image and label
+        if self.augment:
+            img = self.apply_augmentation(img)
+        img = torch.from_numpy(img)
+        img = img.permute(2, 0, 1)
+        img = img.float() / 255.0
+        return img, label
     
     def preprocess_img(
             self,
             img: np.ndarray,
             text: str
     ):
-        target_width, target_height = self.image_size  # Get target width and height so we can set image accordingly
-        h, w = img.shape[:2]  # Original image height and width
-        scale = min(target_width / w, target_height / h)  # Scaling factor to maintain aspect ratio
-        new_width, new_height = int(w * scale), int(h * scale)  # Compute new dimensions
-        img = cv2.resize(img, (new_width, new_height))  # Resize image
+        target_width, target_height = self.image_size
+        h, w = img.shape[:2]
+        scale = min(target_width / w, target_height / h)
+        new_width, new_height = int(w * scale), int(h * scale)
+        img = cv2.resize(img, (new_width, new_height))
 
-        pad_w = target_width - new_width  # Total horizontal padding needed
-        pad_h = target_height - new_height  # Total vertical padding needed
-        left = pad_w // 2  # Left padding
-        right = pad_w - left  # Right padding
-        top = pad_h // 2  # Top padding
-        bottom = pad_h - top  # Bottom padding
+        pad_w = target_width - new_width
+        pad_h = target_height - new_height
+        left = pad_w // 2
+        right = pad_w - left
+        top = pad_h // 2
+        bottom = pad_h - top
 
         img = cv2.copyMakeBorder(
             img,
-            top,  # Top border
-            bottom,  # Bottom border
-            left,  # Left border
-            right,  # Right border
-            cv2.BORDER_CONSTANT,  # Use constant color for padding (one of three possible options)
-            value=255  # White padding
+            top,
+            bottom,
+            left,
+            right,
+            cv2.BORDER_CONSTANT,
+            value=255
         )
-        return img, text  # Return padded image and unchanged label
+        return img, text
     
     def apply_augmentation(
             self,
             img: np.ndarray
     ) -> np.ndarray:
         
-        if np.random.rand() < 0.5:  # 50% chance to apply sharpening
-            img = self.random_sharpen(img)  # Apply random sharpening
+        if np.random.rand() < 0.5:
+            img = self.random_sharpen(img)
 
-        if np.random.rand() < 0.5:  # 50% chance to apply affine transform
-            img = np.array(self.affine_transform(img))  # Apply affine transform and convert back to NumPy --> usually converted as OpenCV expects + faster to process
-        return img  # Return augmented image
+        if np.random.rand() < 0.5:
+            img = np.array(self.affine_transform(img))
+        return img
     
     @staticmethod
     def random_sharpen(
-        image: np.ndarray,  # Input image as NumPy array
-        strength_range: Tuple[float, float] = (0.25, 1.0),  # Range for sharpening strength
-        lightness_range: Tuple[float, float] = (0.75, 2.0)  # Range for brightness adjustment
+        image: np.ndarray,
+        strength_range: Tuple[float, float] = (0.25, 1.0),
+        lightness_range: Tuple[float, float] = (0.75, 2.0)
     ) -> np.ndarray:
-        alpha = np.random.uniform(*strength_range)  # Randomly pick sharpening strength --> * used to divide into augments
-        lightness = np.random.uniform(*lightness_range)  # Randomly pick center weight for kernel
+        alpha = np.random.uniform(*strength_range)
+        lightness = np.random.uniform(*lightness_range)
 
-        kernel_identity = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]], dtype = np.float32)  # Identity kernel (no change) --> base kernels
-        # It is an identity matrix --> '1' is the centre pixel
-        kernel_sharpen = np.array([[-1, -1, -1], [-1, 8 + lightness, -1], [-1, -1, -1]], dtype = np.float32)  # Sharpen kernel emphasizing edges
-        # '+' means boosting this pixel, '-' means ignoring this pixel
-        # Wants to seperate the centre pixel from the neighbors --> brightness makes strokes darker
-        kernel = (1 - alpha) * kernel_identity + alpha * kernel_sharpen  # Blend identity and sharpen kernels e.g 0.3 means 70% of the original
-        return cv2.filter2D(image, -1, kernel)  # Apply convolution with blended kernel --> the kernel acts as a filter over the image, modifying the pixels and sharpening the image as a whole
+        kernel_identity = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]], dtype=np.float32)
+        kernel_sharpen = np.array([[-1, -1, -1], [-1, 8 + lightness, -1], [-1, -1, -1]], dtype=np.float32)
+        kernel = (1 - alpha) * kernel_identity + alpha * kernel_sharpen
+        return cv2.filter2D(image, -1, kernel)
 
     @staticmethod
     def label_indexer(vocab_dict: Dict[str, int], label: str) -> np.ndarray:
-        return np.array([vocab_dict[c] for c in label if c in vocab_dict], dtype=np.int64)  # Map chars to indices
+        return np.array([vocab_dict[c] for c in label if c in vocab_dict], dtype=np.int64)
 
     @staticmethod
     def label_padding(padding_value: int, max_len: int, label: np.ndarray) -> np.ndarray:
-        label = label[:max_len]  # Truncate label if too long
-        return np.pad(label, (0, max_len - len(label)), mode="constant", constant_values=padding_value)  # Pad label
+        label = label[:max_len]
+        return np.pad(label, (0, max_len - len(label)), mode="constant", constant_values=padding_value)
 
     def single_image_preprocessing(self, img: np.ndarray) -> torch.Tensor:
-        img, _ = self.preprocess_img(img, "")  # Resize and pad image
-        img = torch.from_numpy(img)  # Convert to tensor
-        img = img.permute(2, 0, 1)  # Convert to Color, Width & Height format
-        img = img.float() / 255.0  # Normalize image
-        return img  # Return processed tensor
-
-
+        img, _ = self.preprocess_img(img, "")
+        img = torch.from_numpy(img)
+        img = img.permute(2, 0, 1)
+        img = img.float() / 255.0
+        return img
